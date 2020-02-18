@@ -1,0 +1,15 @@
+{
+  "name": "function-puzzles",
+  "version": "1.0.0",
+  "description": "You are to solve some functional puzzles.\r ## Topics\r 1. Functional Programming\r 1. JS Types\r 1. \"this\" keyword\r 1. Currying\r 1. Partial Application\r 1. Linear Fold\r 1. Lazy Evaluation\r 1. Memoization\r ## Requirements\r * Code style\r * No bundling and modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mocha": "^7.0.1"
+  }
+}
