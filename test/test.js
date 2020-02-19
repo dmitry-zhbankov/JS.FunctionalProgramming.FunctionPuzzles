@@ -2,9 +2,25 @@ let assert = require("assert");
 let funcLib = require("../func-puzzles");
 
 describe("func-lib", function () {
-    describe("function memo()", function () {
-        it("should return 5 when value is 5", function () {
-            assert.strictEqual(5, 5);
+    describe("function partial()", function () {
+        let sum = function (...args) {
+            let res=0;
+            for (let arg of args){
+                res+=arg;
+            }
+            return res;
+        };
+        it("should return 9 when value is partial(sum,2)(3,4)", function () {
+            assert.strictEqual(funcLib.partial(sum,2)(3,4), 9);
+        });
+        it("should return 11 when value is partial(sum,2)(4,5)", function () {
+            assert.strictEqual(funcLib.partial(sum,2)(4,5), 11);
+        });
+        it("should return 9 when value is partial(sum,2,3)(4)", function () {
+            assert.strictEqual(funcLib.partial(sum,2, 3)(4), 9);
+        });
+        it("should return 9 when value is partial(sum,2,3)(4)", function () {
+            assert.strictEqual(funcLib.partial(sum,2, 3, 4)(5, 6 ,7), 27);
         });
     });
 });
