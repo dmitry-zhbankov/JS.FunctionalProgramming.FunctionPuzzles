@@ -1,4 +1,4 @@
-var funcLib = {};
+let funcLib = {};
 
 arrLib = (function (context) {
     context.partial = function (g, ...args1) {
@@ -25,52 +25,149 @@ arrLib = (function (context) {
     };
 
     context.map = function (array, callback) {
-        let res=[];
-        for (let item of array){
+        let res = [];
+        for (let item of array) {
             res.push(callback(item));
         }
         return res;
     };
 
-    context.filter=function (array,callback) {
-        let res=[];
-        for (let item of array){
-            if (callback(item)){
+    context.filter = function (array, callback) {
+        let res = [];
+        for (let item of array) {
+            if (callback(item)) {
                 res.push(item);
             }
         }
         return res;
     };
 
-    context.avgEvenNums=function (array) {
-        let evens=context.filter(array,x=>x%2===0);
-        let sum=context.linFold(evens,(accum,item,index,initialVal)=>{return  accum+item});
-        return sum/evens.length;
+    context.avgEvenNums = function (array) {
+        let evens = context.filter(array, x => x % 2 === 0);
+        let sum = context.linFold(evens, (accum, item, index, initialVal) => {
+            return accum + item
+        });
+        return sum / evens.length;
     };
 
-    context.lazy=function(){
+    context.lazy = function () {
 
     };
 
-    context.memo=function(f){
-        let mem={};
+    context.memo = function (f) {
+        let mem = {};
         return function (n) {
-            if (n in mem){
+            if (n in mem) {
                 return mem[n];
-            }
-            else {
-                return mem[n]=f(n);
+            } else {
+                return mem[n] = f(n);
             }
         }
     };
 
-    context.multiply=function(...args) {
-        let res=1;
-        for (let arg of args){
-            res*=arg;
+    context.multiply = function (...args) {
+        let res = 1;
+        for (let arg of args) {
+            res *= arg;
         }
         return res;
     };
+
+    context.Shape = function (name) {
+        return new Shape(name);
+    };
+
+    context.Rectangle = function (width, height) {
+        return new Rectangle(width, height);
+    };
+
+    context.Square = function (sideLength) {
+        return new Square(sideLength)
+    };
+
+    context.ShapeStore=function () {
+        return new ShapeStore();
+    };
+
+    class Shape {
+        name;
+
+        constructor(name) {
+            this.name = name;
+        }
+
+        getPerimeter() {
+            throw new Error("Not implemented");
+        }
+
+        getArea() {
+            throw new Error("Not implemented");
+        }
+    }
+
+    class Rectangle extends Shape {
+        width;
+        height;
+
+        constructor(width, height) {
+            super("Rectangle");
+            this.width = width;
+            this.height = height;
+        }
+
+        getArea() {
+            return this.width * this.height;
+        }
+
+        getPerimeter() {
+            return 2 * (this.width + this.height)
+        }
+    }
+
+    class Square extends Shape {
+        sideLength;
+
+        constructor(sideLength) {
+            super("Square");
+            this.sideLength = sideLength;
+        }
+
+        getArea() {
+            return this.sideLength*this.sideLength;
+        }
+
+        getPerimeter() {
+            return this.sideLength * 4;
+        }
+    }
+
+    class ShapeStore {
+        shapes;
+
+        constructor() {
+            this.shapes = [];
+        }
+
+        getTotalRectPerimeter() {
+            let res = 0;
+            for (let shape of this.shapes) {
+                if (shape instanceof Rectangle) {
+                    res += shape.getPerimeter();
+                }
+            }
+            return res;
+        }
+
+        getTotalSquareArea() {
+            let res = 0;
+            for (let shape of this.shapes) {
+                if (shape instanceof Square) {
+                    res += shape.getArea();
+                }
+            }
+            return res;
+        }
+    }
 
     return context;
 
