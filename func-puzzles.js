@@ -50,8 +50,10 @@ arrLib = (function (context) {
         return sum / evens.length;
     };
 
-    context.lazy = function () {
-
+    context.lazy = function (f) {
+        return function (...args) {
+            return f.bind(null, ...args);
+        }
     };
 
     context.memo = function (f) {
@@ -85,7 +87,7 @@ arrLib = (function (context) {
         return new Square(sideLength)
     };
 
-    context.ShapeStore=function () {
+    context.ShapeStore = function () {
         return new ShapeStore();
     };
 
@@ -133,7 +135,7 @@ arrLib = (function (context) {
         }
 
         getArea() {
-            return this.sideLength*this.sideLength;
+            return this.sideLength * this.sideLength;
         }
 
         getPerimeter() {
@@ -170,7 +172,6 @@ arrLib = (function (context) {
     }
 
     return context;
-
 })(funcLib);
 
 module.exports = funcLib;
