@@ -10,8 +10,25 @@ describe("func-lib", function () {
         }
         return res;
     };
+
     let sum2 = function (a, b, c) {
         return a + b + c;
+    };
+
+    let sumN = function (n) {
+        let sum = 0;
+        for (let i = 0; i < n; i++) {
+            sum += i;
+        }
+        return sum;
+    };
+
+    let objSum = function (...args) {
+        let res = 0;
+        for (let arg of args) {
+            res += arg.value;
+        }
+        return res;
     };
 
     describe("function partial()", function () {
@@ -108,61 +125,68 @@ describe("func-lib", function () {
         });
     });
     describe("function memo()", function () {
-        let sumN = function (n) {
-            let sum = 0;
-            for (let i = 0; i < n; i++) {
-                sum += i;
-            }
-            return sum;
+        let checkMemo = function (func, expectedRes, ...args) {
+            let memoFunc = funcLib.memo(func);
+
+            let t1, t2;
+            let dt1, dt2;
+            let res;
+
+            t1 = performance.now();
+            res = memoFunc(...args);
+            t2 = performance.now();
+            dt1 = t2 - t1;
+
+            it("should return expectedRes", function () {
+                assert.equal(res, expectedRes);
+            });
+
+            t1 = performance.now();
+            res = memoFunc(...args);
+            t2 = performance.now();
+            dt2 = t2 - t1;
+
+            it("t1 should be more than t2", function () {
+                assert.equal(dt1 > dt2, true);
+            });
         };
+        describe('single argument memo', function () {
+            describe('sumN memo', function () {
+                let n = 1e7;
+                describe('should return (n - 1) / 2 * n when n is 1e7', function () {
+                    checkMemo(sumN, (n - 1) / 2 * n, n);
+                });
 
-        let sumMemo = funcLib.memo(sumN);
-
-
-        let t1, t2;
-        let dt11, dt12, dt21, dt22;
-
-        let n = 1e7;
-        t1 = performance.now();
-        let res = sumMemo(n);
-        t2 = performance.now();
-        dt11 = t2 - t1;
-        it("should return (n-1)/2*n=499500 when the parameter is n=1e7", function () {
-
-            assert.equal(res, (n - 1) / 2 * n);
+                n = 1e8;
+                describe('should return (n - 1) / 2 * n when n is 1e8', function () {
+                    checkMemo(sumN, (n - 1) / 2 * n, n);
+                });
+            });
         });
-
-        t1 = performance.now();
-        res = sumMemo(n);
-        t2 = performance.now();
-        dt21 = t2 - t1;
-        it("should return (n-1)/2*n=499500 when the parameter is n=1e7", function () {
-            assert.equal(res, (n - 1) / 2 * n);
+        describe("multiple arguments memo", function () {
+            describe('sum memo', function () {
+                describe('should return 6 when values are 1,2,3', function () {
+                    checkMemo(sum, 6, 1, 2, 3);
+                });
+                describe('should return 10 when values are 1,2,3,4', function () {
+                    checkMemo(sum, 10, 1, 2, 3, 4);
+                });
+            });
         });
-
-        n = 1e8;
-        t1 = performance.now();
-        res = sumMemo(n);
-        t2 = performance.now();
-        dt12 = t2 - t1;
-        it("should return (n-1)/2*n=499999500000 when the parameter is n=1e8", function () {
-            assert.equal(res, (n - 1) / 2 * n);
+        describe("object memo", function () {
+            describe('objSum memo', function () {
+                describe('should return 6 when values are 1,2,3', function () {
+                    checkMemo(objSum, 6, {value: 1}, {value: 2}, {value: 3});
+                });
+                describe('should return 10 when values are 1,2,3,4', function () {
+                    checkMemo(objSum, 10, {value: 1}, {value: 2}, {value: 3}, {value: 4});
+                });
+            });
         });
-
-        t1 = performance.now();
-        res = sumMemo(n);
-        t2 = performance.now();
-        dt22 = t2 - t1;
-        it("should return (n-1)/2*n=499999500000 when the parameter is n=1e8", function () {
-            assert.equal(sumMemo(n), (n - 1) / 2 * n);
-        });
-
-        it("t1 should be more than t2 when the parameter is n=1e7", function () {
-            assert.equal(dt11 > dt21, true);
-        });
-
-        it("t1 should be more than t2 when the parameter is n=1e8", function () {
-            assert.equal(dt12 > dt22, true);
+    });
+    describe("function lazy()", function () {
+        it("should return 9 when value is funcLib.lazy(sum)(2,3,4)()", function () {
+            assert.deepStrictEqual(funcLib.lazy(sum)(2, 3, 4)(), 9);
         });
     });
 });

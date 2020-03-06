@@ -1,15 +1,12 @@
 let funcLib = {};
 
-arrLib = (function (context) {
-    context.partial = function (g, ...args1) {
-        return function (...args2) {
-            return g(...args1, ...args2);
-        }
+funcLib = (function (context) {
+    context.partial = function (g, ...args) {
+        return g.bind(null, ...args);
     };
 
     context.curry = function (f) {
-        return function currify() {
-            const args = Array.prototype.slice.call(arguments);
+        return function currify(...args) {
             return args.length >= f.length ?
                 f.apply(null, args) :
                 currify.bind(null, ...args)
@@ -58,21 +55,25 @@ arrLib = (function (context) {
 
     context.memo = function (f) {
         let mem = {};
-        return function (n) {
-            if (n in mem) {
-                return mem[n];
-            } else {
-                return mem[n] = f(n);
+        return function () {
+            let args = Array.prototype.slice.call(arguments);
+            let objArgs=[];
+            for (let arg of args){
+                if (typeof arg === "object") {
+                    arg=JSON.stringify(arg);
+                }
+                objArgs.push(arg);
+            }
+            if (objArgs in mem)
+                return mem[objArgs];
+            else {
+                return mem[objArgs] = f.apply(this, args);
             }
         }
     };
 
     context.multiply = function (...args) {
-        let res = 1;
-        for (let arg of args) {
-            res *= arg;
-        }
-        return res;
+        return context.linFold(args, (acum, item, index, initVal) => acum * item, 1);
     };
 
     context.Shape = function (name) {
